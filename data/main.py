@@ -1,10 +1,16 @@
 from tabulate import tabulate
 import requests
 import inquirer
-from db_manager import DBManager
+from data.db_manager import DBManager
 
 
 def get_employers_data(employer_ids):
+    """
+    Получает данные о работодателях с сайта hh.ru.
+
+    param employer_ids: Список идентификаторов работодателей.
+
+    """
     url = 'https://api.hh.ru/employers'
     employers_data = []
     for employer_id in employer_ids:
@@ -15,6 +21,13 @@ def get_employers_data(employer_ids):
 
 
 def get_vacancies_data(employer_id, limit=3):
+    """
+    Получает данные о вакансиях работодателя с сайта hh.ru.
+
+    :param employer_id: Идентификатор работодателя.
+    :param limit: Ограничение на количество вакансий.
+
+    """
     url = f'https://api.hh.ru/vacancies?employer_id={employer_id}&per_page={limit}'
     response = requests.get(url)
     if response.status_code == 200:
@@ -23,6 +36,12 @@ def get_vacancies_data(employer_id, limit=3):
 
 
 def insert_employers_data(db_manager, employers):
+    """
+    Вставляет данные о работодателях в базу данных.
+
+    :param db_manager: Объект DBManager для работы с базой данных.
+    :param employers: Список данных о работодателях.
+    """
     for employer in employers:
         db_manager.cur.execute("""
             INSERT INTO employers (id, name, url) 
@@ -34,6 +53,13 @@ def insert_employers_data(db_manager, employers):
 
 
 def insert_vacancies_data(db_manager, vacancies, employer_id):
+    """
+    Вставляет данные о вакансиях в базу данных.
+
+    :param db_manager: Объект DBManager для работы с базой данных.
+    :param vacancies: Список данных о вакансиях.
+    :param employer_id: Идентификатор работодателя.
+    """
     unique_vacancies = {vacancy['id']: vacancy for vacancy in vacancies}.values()
     for vacancy in unique_vacancies:
         salary_from = None
@@ -47,6 +73,12 @@ def insert_vacancies_data(db_manager, vacancies, employer_id):
 
 
 def group_vacancies_by_company(vacancies):
+    """
+    Группирует вакансии по компаниям.
+
+    :param vacancies: Список вакансий.
+
+    """
     companies = {}
     for vacancy in vacancies:
         company_name = vacancy[0]
@@ -57,6 +89,11 @@ def group_vacancies_by_company(vacancies):
 
 
 def display_menu():
+    """
+    Отображает меню и возвращает выбор пользователя.
+
+
+    """
     questions = [
         inquirer.List(
             'choice',
@@ -75,6 +112,9 @@ def display_menu():
 
 
 def main():
+    """
+    Основная функция, выполняющая логику приложения.
+    """
     # Список интересных компаний
     employer_ids = [
         '1740',  # Яндекс
