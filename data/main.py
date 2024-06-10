@@ -1,7 +1,7 @@
 from tabulate import tabulate
 import requests
 import inquirer
-from data.db_manager import DBManager
+from db_manager import DBManager
 
 
 def get_employers_data(employer_ids):
