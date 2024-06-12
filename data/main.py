@@ -2,14 +2,15 @@ from tabulate import tabulate
 import requests
 import inquirer
 from db_manager import DBManager
+from db_setup import create_database, create_tables
 
 
 def get_employers_data(employer_ids):
     """
     Получает данные о работодателях с сайта hh.ru.
 
-    param employer_ids: Список идентификаторов работодателей.
-
+    :param employer_ids: Список идентификаторов работодателей.
+    :return: Список данных о работодателях.
     """
     url = 'https://api.hh.ru/employers'
     employers_data = []
@@ -26,7 +27,7 @@ def get_vacancies_data(employer_id, limit=3):
 
     :param employer_id: Идентификатор работодателя.
     :param limit: Ограничение на количество вакансий.
-
+    :return: Список данных о вакансиях.
     """
     url = f'https://api.hh.ru/vacancies?employer_id={employer_id}&per_page={limit}'
     response = requests.get(url)
@@ -77,7 +78,7 @@ def group_vacancies_by_company(vacancies):
     Группирует вакансии по компаниям.
 
     :param vacancies: Список вакансий.
-
+    :return: Словарь с компаниями и их вакансиями.
     """
     companies = {}
     for vacancy in vacancies:
@@ -92,7 +93,7 @@ def display_menu():
     """
     Отображает меню и возвращает выбор пользователя.
 
-
+    :return: Выбор пользователя.
     """
     questions = [
         inquirer.List(
@@ -115,6 +116,10 @@ def main():
     """
     Основная функция, выполняющая логику приложения.
     """
+    # Создание базы данных и таблиц
+    create_database()
+    create_tables()
+
     # Список интересных компаний
     employer_ids = [
         '1740',  # Яндекс
